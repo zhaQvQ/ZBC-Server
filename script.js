@@ -67,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // 移动菜单切换
     mobileMenu.addEventListener('click', (e) => {
         e.stopPropagation();
-        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        if (window.innerWidth <= 1130) {
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        }
     });
 
     // 点击菜单项后关闭菜单
@@ -81,7 +83,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 点击页面其他区域关闭菜单
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('nav') && !e.target.closest('.mobile-menu')) {
+        if (window.innerWidth <= 1130 &&
+            !e.target.closest('nav') &&
+            !e.target.closest('.mobile-menu')) {
             navMenu.style.display = 'none';
         }
     });
