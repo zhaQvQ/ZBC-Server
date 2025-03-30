@@ -419,23 +419,12 @@ nav ul li a:hover:before {
 }
 
 /* ==================== 服务器信息卡片 ==================== */
-.server-info {
+.server-info-box {
     background: var(--glass-dark);
     border-radius: var(--border-radius);
-    padding: 15px;
-    margin-bottom: 25px;
-}
-
-.server-address {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.address-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .address-value {
@@ -443,11 +432,11 @@ nav ul li a:hover:before {
     font-size: 1.1rem;
     color: var(--light);
     background: rgba(0, 0, 0, 0.2);
-    padding: 5px 10px;
+    padding: 0.5rem;
     border-radius: 5px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
 }
 
 .copy-btn {
@@ -456,11 +445,19 @@ nav ul li a:hover:before {
     color: var(--primary-light);
     cursor: pointer;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
+    padding: 0.25rem;
 }
 
 .copy-btn:hover {
     color: var(--light);
+}
+
+.copy-btn.absolute {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
 }
 
 .server-buttons {
@@ -487,19 +484,31 @@ nav ul li a:hover:before {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    padding: 20px;
+    /* 新增：确保窄屏有内边距 */
+    overflow: hidden;
+    /* 新增：防止内容溢出 */
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    /* 修改：动态最小宽度 */
+    gap: 20px;
+    max-width: 1200px;
+    /* 新增：限制最大宽度 */
+    margin: 0 auto;
+    /* 新增：水平居中 */
+    padding: 0 15px;
+    /* 新增：内边距保护 */
 }
 
 .feature-card {
     background: var(--bg-card);
     border-radius: var(--border-radius);
-    padding: 30px;
-    transition: all 0.3s ease;
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* 优化：指定过渡属性 */
     position: relative;
     z-index: 1;
     overflow: hidden;
@@ -507,6 +516,10 @@ nav ul li a:hover:before {
     height: 100%;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    /* 新增：确保宽度适应 */
+    box-sizing: border-box;
+    /* 新增：包含padding在宽度内 */
 }
 
 .feature-card:hover {
@@ -851,14 +864,6 @@ nav ul li a:hover:before {
     text-align: center;
 }
 
-.server-box {
-    background: var(--glass-dark);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .server-label {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
@@ -875,27 +880,6 @@ nav ul li a:hover:before {
     text-align: center;
     position: relative;
     margin-bottom: 10px;
-}
-
-.copy-address {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    color: var(--primary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.copy-address:hover {
-    color: var(--primary-light);
-}
-
-.port-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
 }
 
 .qr-code {
@@ -1189,34 +1173,22 @@ nav ul li a:hover:before {
 
 /* ==================== 响应式设计 ==================== */
 @media (max-width: 1130px) {
-    .logo-text {
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 992px) {
     nav ul {
         display: none;
-    }
-
-    .mobile-menu {
-        display: block;
-    }
-}
-
-@media (max-width: 768px) {
-    nav ul {
         position: absolute;
         top: 80px;
         left: 0;
         width: 100%;
         background: rgba(15, 15, 26, 0.95);
-        -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         flex-direction: column;
         gap: 0;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         z-index: 100;
+    }
+
+    nav ul.show {
+        display: flex;
     }
 
     nav ul li a {
@@ -1225,28 +1197,29 @@ nav ul li a:hover:before {
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .hero-grid {
-        grid-template-columns: 1fr;
+    .mobile-menu {
+        display: block;
     }
 
+    .hero-grid,
     .join-grid {
         grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 485px) {
+    :root {
+        --border-radius: 6px;
+    }
+
     nav ul li a {
-        font-size: 0.8rem;
+        font-size: 0.5rem;
         padding: 8px 10px;
     }
 
     .nav-buttons .btn {
         padding: 5px 10px;
         font-size: 0.8rem;
-    }
-
-    .logo img {
-        width: 35px;
     }
 
     .logo-text {

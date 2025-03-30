@@ -40,22 +40,61 @@ document.addEventListener('DOMContentLoaded', function () {
             particlesContainer.appendChild(particle);
         }
     }
-
     createParticles();
 
-    // ==================== 导航栏滚动效果 ====================
+    // ==================== 导航栏功能 ====================
     const header = document.querySelector('header');
-    function handleScroll() {
-        header.classList.toggle('scrolled', window.scrollY > 100);
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const navMenu = document.querySelector('nav ul');
+    const navLinks = document.querySelectorAll('nav ul li a');
+
+    // 初始化菜单状态
+    function initMenu() {
+        if (window.innerWidth <= 1130) {
+            navMenu.style.display = 'none';
+            mobileMenu.style.display = 'block';
+        } else {
+            navMenu.style.display = 'flex';
+            mobileMenu.style.display = 'none';
+        }
     }
-    window.addEventListener('scroll', handleScroll);
+
+    // 滚动效果
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    // 移动菜单切换
+    mobileMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    // 点击菜单项后关闭菜单
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1130) {
+                navMenu.style.display = 'none';
+            }
+        });
+    });
+
+    // 点击页面其他区域关闭菜单
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('nav') && !e.target.closest('.mobile-menu')) {
+            navMenu.style.display = 'none';
+        }
+    });
+
+    // 响应式调整
+    window.addEventListener('resize', initMenu);
+    initMenu(); // 初始化执行
 
     // ==================== 返回顶部按钮 ====================
     const backToTop = document.querySelector('.back-to-top');
-    function handleBackToTop() {
+    window.addEventListener('scroll', () => {
         backToTop.classList.toggle('active', window.scrollY > 500);
-    }
-    window.addEventListener('scroll', handleBackToTop);
+    });
 
     backToTop.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -66,31 +105,11 @@ document.addEventListener('DOMContentLoaded', function () {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
-
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
-
-            // 移动端点击后收起菜单
-            if (window.innerWidth <= 768) {
-                navMenu.style.display = 'none';
-            }
         });
     });
-
-    // ==================== 移动端菜单 ====================
-    const mobileMenu = document.querySelector('.mobile-menu');
-    const navMenu = document.querySelector('nav ul');
-
-    mobileMenu.addEventListener('click', () => {
-        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    // ==================== 响应式导航 ====================
-    function handleResize() {
-        navMenu.style.display = window.innerWidth > 992 ? 'flex' : 'none';
-    }
-    window.addEventListener('resize', handleResize);
 
     // ==================== FAQ手风琴效果 ====================
     const accordionItems = document.querySelectorAll('.accordion-item');
@@ -115,11 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ==================== 复制服务器地址 ====================
-    const copyButtons = document.querySelectorAll('#copy-address, #copy-port, #copy-address-2');
+    const copyButtons = document.querySelectorAll('#copy-address, #copy-port, #copy-address-2, #copy-port-2');
     copyButtons.forEach(button => {
         button.addEventListener('click', async function () {
-            const textToCopy = this.id === 'copy-port' ? '15001' : 'zbc.eo.mk';
-
+            const textToCopy = this.id.includes('port') ? '15001' : 'zbc.eo.mk';
             try {
                 await navigator.clipboard.writeText(textToCopy);
                 const originalContent = this.innerHTML;
@@ -130,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
     // ==================== 服务器状态查询 ====================
     async function fetchServerStatus() {
         const statusDot = document.getElementById('server-status-dot');
@@ -143,17 +160,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (data.online) {
-                // 服务器在线
                 statusDot.className = 'status-dot online';
                 statusText.textContent = '在线';
                 playerCount.textContent = data.players?.online ?? '?';
                 playerMax.textContent = data.players?.max ?? '2024';
-
-                // 可选：显示MOTD和版本信息
-                updateServerInfo(data.motd?.clean, 'server-motd');
-                updateServerInfo(data.version?.name, 'server-version');
             } else {
-                // 服务器离线
                 setServerOffline();
             }
         } catch (error) {
@@ -169,14 +180,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('player-max').textContent = '2024';
     }
 
-    function updateServerInfo(info, elementId) {
-        const element = document.getElementById(elementId);
-        if (element && info) {
-            element.textContent = info.replace('\\n', ' ');
-        }
-    }
-
-    // 初始获取服务器状态并设置定时器
     fetchServerStatus();
     setInterval(fetchServerStatus, 30000);
 
@@ -201,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     stat.textContent = finalValue;
                 }
             }
-
             requestAnimationFrame(updateNumber);
         });
     }
