@@ -1,0 +1,1 @@
+import{_ as d,c as r,o as s,ae as n}from"./chunks/framework.DsCIUHsX.js";const c=JSON.parse('{"title":"🚨 服务器封禁名单","description":"","frontmatter":{},"headers":[],"relativePath":"BanList.md","filePath":"BanList.md"}'),o={name:"BanList.md"};function a(e,t,i,g,l,h){return s(),r("div",null,t[0]||(t[0]=[n("",8)]))}const u=d(o,[["render",a]]);export{c as __pageData,u as default};
