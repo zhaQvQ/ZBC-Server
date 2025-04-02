@@ -1,0 +1,79 @@
+name: Build and Deploy VitePress to Main
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+jobs:
+  check_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.detect_changes.outputs.has_changes }}
+      short_sha: ${{ steps.get_sha.outputs.short_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get short SHA
+        id: get_sha
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Detect docs changes
+        id: detect_changes
+        run: |
+          git diff --quiet HEAD^ HEAD -- docs/ || echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check_changes
+    if: needs.check_changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install and build
+        working-directory: docs
+        run: |
+          npm ci
+          npm run docs:build
+          mkdir -p .vitepress/dist
+          touch .vitepress/dist/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitepress-dist
+          path: docs/.vitepress/dist
+          retention-days: 1
+
+  deploy:
+    needs: [check_changes, build]
+    if: needs.check_changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: docs
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vitepress-dist
+          path: docs
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff-index --quiet HEAD -- || (git commit -m "Update from ${{ needs.check_changes.outputs.short_sha }}" && git push origin main)
